@@ -1,0 +1,4 @@
+.env
+ansible/inventory/hosts.yml
+*.retry
+data/
