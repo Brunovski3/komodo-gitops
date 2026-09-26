@@ -2,3 +2,15 @@
 ansible/inventory/hosts.yml
 *.retry
 data/
+# Export cruto do servidor — nunca commitado cru
+local-export/
+
+# Segredos por qualquer nome
+*secret*
+*token*
+*.key
+*.pem
+credentials*.yaml
+
+# Export cru do servidor OCI (puxado por oci/scripts/pull-from-server.sh)
+local-export/
