@@ -1,8 +1,8 @@
 # DevOps Homelab
 
-Infraestrutura auto-hospedada em dois ambientes: uma **VPS Docker** para publicar aplicações web com HTTPS, deploy automatizado e monitoramento, e um **cluster K3s na Oracle Cloud** em HA com acesso zero-trust via Tailscale.
+Infraestrutura auto-hospedada para publicar aplicações web com HTTPS, deploy automatizado, monitoramento e acesso administrativo privado. A orquestração é GitOps self-hosted: declaração em Docker Compose versionado, gerência via Komodo (IDP) e deploys acionados por Git.
 
-O objetivo é manter plataformas simples de operar, sem abrir ferramentas de administração ou o banco de dados para a internet.
+O objetivo é manter uma plataforma simples de operar em uma VPS, sem abrir ferramentas de administração ou o banco de dados para a internet.
 
 ## Arquitetura
 
@@ -30,21 +30,6 @@ flowchart TB
     tailscale --> komodo
 ```
 
-### Cluster OCI (K3s)
-
-```mermaid
-flowchart TB
-    tailnet[Tailnet Tailscale] -->|HTTPS privado| pg[ProxyGroup\nTailscale Operator]
-    pg --> traefik[Traefik\nIngress + TLS]
-    traefik --> kcu[Keycloak\nIAM]
-    traefik --> n8n[n8n\nAutomação]
-
-    subgraph k3s[Cluster K3s na OCI]
-        cp[control-plane] --- w1[worker 1] --- w2[worker 2]
-    end
-    pg --- k3s
-    apps[Helm Releases\napps/] --- k3s
-```
 
 ## Componentes
 
@@ -105,11 +90,6 @@ flowchart TB
 │   ├── postgres/
 │   ├── monitoring/
 │   └── application/
-├── oci/                 # Cluster K3s na OCI (HA + zero-trust) — ver oci/README.md
-│   ├── cluster/
-│   ├── networking/      # Traefik + Tailscale Operator/ProxyGroup
-│   ├── apps/            # Helm releases (Keycloak, n8n)
-│   └── scripts/         # Coleta de manifests do servidor (pull-from-server.sh)
 ├── docs/                # Diagramas, runbooks e decisões técnicas
 ├── scripts/             # Backup, manutenção e validações operacionais
 └── .github/workflows/   # CI, build e deploy
@@ -139,7 +119,6 @@ O repositório começa pela documentação da arquitetura. A implementação ser
 - [ ] Configurar Komodo, runner self-hosted e GitHub Actions.
 - [ ] Configurar monitores e alertas no Uptime Kuma.
 - [ ] Documentar operações, rollback e recuperação de desastre.
-- [ ] Coletar manifests do K3s na OCI (`oci/scripts/pull-from-server.sh`) e revisar em `local-export/`.
 
 ## Aviso sobre segredos
 

@@ -11,6 +11,3 @@ local-export/
 *.key
 *.pem
 credentials*.yaml
-
-# Export cru do servidor OCI (puxado por oci/scripts/pull-from-server.sh)
-local-export/
