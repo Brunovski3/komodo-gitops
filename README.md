@@ -2,33 +2,49 @@
 
 Infraestrutura auto-hospedada para publicar aplicações web com HTTPS, deploy automatizado, monitoramento e acesso administrativo privado. A orquestração é GitOps self-hosted: declaração em Docker Compose versionado, gerência via Komodo (IDP) e deploys acionados por Git.
 
-O objetivo é manter uma plataforma simples de operar em uma VPS, sem abrir ferramentas de administração ou o banco de dados para a internet.
+O objetivo de um blueprint de referência funciona para qualquer stack (frontend + backend + banco). O desenho abaixo usa, como aplicação de exemplo, um **frontend React + Vite** e um **backend FastAPI** (porta interna 8000) — troque pelos containers da aplicação em questão sem alterar as demais camadas.
 
 ## Arquitetura
 
 ```mermaid
 flowchart TB
     internet[Usuários / Internet] -->|HTTPS| cloudflare[Cloudflare\nDNS, proxy e proteção de borda]
-    cloudflare -->|HTTPS com Origin CA| traefik[Traefik\nReverse proxy e roteamento]
+    cloudflare -->|proxy| traefik
 
-    subgraph vps[VPS / Docker Host]
-        traefik --> frontend[Frontend\nReact + Vite]
-        traefik --> backend[Backend\nGo]
-        backend --> postgres[(PostgreSQL\nprivado e persistente)]
+    subgraph vps[VPS / Docker Host — Traefik, Komodo, Uptime Kuma, App Stack e GitHub self-hosted runner]
+        traefik[Traefik\nReverse proxy / roteador de entrada\nTLS com Cloudflare Origin CA]
 
-        komodo[Komodo\nGerência de stacks] -->|deploy / update| app[Stack da aplicação]
-        app --- frontend
-        app --- backend
+        subgraph app[App Stack — gerenciado pelo Komodo]
+            frontend[Frontend\nReact + Vite]
+            backend[Backend\nFastAPI :8000]
+        end
 
-        runner[GitHub Self-hosted Runner] -->|aciona deploy| komodo
+        traefik --> frontend
+        traefik --> backend
+
+        db[(PostgreSQL Externo\nfora do compose da aplicação,\nacesso privado apenas pelo backend)]
+        backend --> db
+
+        komodo[Komodo\nGerência de stack\ndeploy / restart / update]
+        komodo -->|gerência| app
+        komodo -.->|update stack| app
+
+        runner[GitHub Self-hosted Runner\nDeploy interno instantâneo]
+        runner -.->|aciona deploy| komodo
+
         kuma[Uptime Kuma\nMonitoramento e alertas]
     end
 
-    github[GitHub\nCódigo e Actions] -->|workflow| runner
-    tailscale[Tailscale\nAcesso privado e SSH] --> vps
-    tailscale --> kuma
-    tailscale --> komodo
+    github[GitHub\nRepositório + Actions\nBuild / release / workflow] -.->|workflow / job| runner
+
+    ts[Tailscale\nAcesso sem expor aplicações\nSomente dispositivos autorizados\nPermite SSH privado]
+    ts -->|acesso SSH| vps
+    ts --> kuma
+    ts --> komodo
+    kuma -.->|checa e alerta| komodo
 ```
+
+> **Blueprint genérico**: o desenho usa React + FastAPI como exemplos de frontend/backend, e PostgreSQL como banco. Qualquer stack entra no quadrado da App Stack sem mover Cloudflare, Traefik, Komodo, runner ou Uptime Kuma — e o fluxo de deploy continua o mesmo, disparado pelo Git.
 
 
 ## Componentes
@@ -36,15 +52,14 @@ flowchart TB
 | Componente | Responsabilidade | Exposição |
 | --- | --- | --- |
 | Cloudflare | DNS, proxy, TLS de borda e proteção | Pública |
-| Traefik | Terminação TLS na origem e roteamento para containers | Pública, somente HTTPS |
-| Frontend | Interface web em React e Vite | Pública via Traefik |
-| Backend | API da aplicação em Go | Via Traefik quando necessário |
-| PostgreSQL | Persistência de dados | Privada, acessível apenas pelo backend |
-| Komodo | Gerência de stacks, deploys, updates e restarts | Privada via Tailscale |
+| Traefik | Terminação TLS na origem (Origin CA) e roteamento para containers | Pública, somente HTTPS |
+| App Stack | Containers da aplicação (ex.: frontend React + Vite, backend FastAPI :8000) | Pública via Traefik |
+| PostgreSQL externo | Persistência de dados, fora do compose da aplicação | Privada, acessível apenas pelo backend |
+| Komodo | Gerência da stack: deploy, restart e update via Git | Privada via Tailscale |
 | GitHub Actions | Build, release e orquestração do deploy | GitHub |
-| Self-hosted Runner | Executor interno dos workflows de deploy | Privado na VPS |
+| Self-hosted Runner | Executor interno dos workflows, acionando o Komodo | Privado na VPS |
 | Uptime Kuma | Health checks, monitoramento e alertas | Privado via Tailscale |
-| Tailscale | Acesso seguro à VPS e às ferramentas administrativas | Dispositivos autorizados |
+| Tailscale | SSH e acesso administrativo sem expor aplicações | Dispositivos autorizados |
 
 ## Fluxos principais
 
@@ -54,7 +69,7 @@ flowchart TB
 2. A Cloudflare resolve o DNS, aplica a proteção de borda e encaminha o tráfego HTTPS.
 3. O Traefik recebe a requisição na VPS usando um certificado Cloudflare Origin CA.
 4. O Traefik encaminha a requisição para o frontend ou backend correto.
-5. Apenas o backend pode se conectar ao PostgreSQL pela rede privada.
+5. Apenas o backend pode se conectar ao PostgreSQL externo, pela rede privada.
 
 ### Deploy
 
@@ -115,7 +130,7 @@ O repositório começa pela documentação da arquitetura. A implementação ser
 - [ ] Provisionar a VPS com Docker e acesso via Tailscale.
 - [ ] Configurar Cloudflare e Traefik com Origin CA.
 - [ ] Subir PostgreSQL privado com backup automatizado.
-- [ ] Adicionar a stack frontend, API em Go e migrations.
+- [ ] Adicionar a stack frontend, backend FastAPI e migrations.
 - [ ] Configurar Komodo, runner self-hosted e GitHub Actions.
 - [ ] Configurar monitores e alertas no Uptime Kuma.
 - [ ] Documentar operações, rollback e recuperação de desastre.
