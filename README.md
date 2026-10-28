@@ -22,7 +22,7 @@ flowchart TB
         traefik --> frontend
         traefik --> backend
 
-        db[(PostgreSQL Externo\nfora do compose da aplicação,\nacesso privado apenas pelo backend)]
+        db[(PostgreSQL\nBare Metal no host\nfora de todo compose)]
         backend --> db
 
         komodo[Komodo\nGerência de stack\ndeploy / restart / update]
@@ -54,7 +54,7 @@ flowchart TB
 | Cloudflare | DNS, proxy, TLS de borda e proteção | Pública |
 | Traefik | Terminação TLS na origem (Origin CA) e roteamento para containers | Pública, somente HTTPS |
 | App Stack | Containers da aplicação (ex.: frontend React + Vite, backend FastAPI :8000) | Pública via Traefik |
-| PostgreSQL externo | Persistência de dados, fora do compose da aplicação | Privada, acessível apenas pelo backend |
+| PostgreSQL (Bare Metal) | Persistência via systemd no próprio host, fora de todo Compose | Privada, acessível apenas pela bridge Docker |
 | Komodo | Gerência da stack: deploy, restart e update via Git | Privada via Tailscale |
 | GitHub Actions | Build, release e orquestração do deploy | GitHub |
 | Self-hosted Runner | Executor interno dos workflows, acionando o Komodo | Privado na VPS |
@@ -69,7 +69,7 @@ flowchart TB
 2. A Cloudflare resolve o DNS, aplica a proteção de borda e encaminha o tráfego HTTPS.
 3. O Traefik recebe a requisição na VPS usando um certificado Cloudflare Origin CA.
 4. O Traefik encaminha a requisição para o frontend ou backend correto.
-5. Apenas o backend pode se conectar ao PostgreSQL externo, pela rede privada.
+5. Apenas o backend pode se conectar ao PostgreSQL (Bare Metal no host), via bridge Docker, com pg_hba restrito.
 
 ### Deploy
 
@@ -99,15 +99,14 @@ flowchart TB
 
 ```text
 .
-├── ansible/             # Provisionamento e configuração da VPS
-├── compose/             # Stacks Docker por serviço (VPS)
+├── compose/                     # Stacks Docker por serviço (VPS)
 │   ├── traefik/
-│   ├── postgres/
 │   ├── monitoring/
 │   └── application/
-├── docs/                # Diagramas, runbooks e decisões técnicas
-├── scripts/             # Backup, manutenção e validações operacionais
-└── .github/workflows/   # CI, build e deploy
+├── docs/
+│   └── postgres-bare-metal.md   # PostgreSQL no host: install, pg_hba, backup, restore
+├── scripts/                     # Backup, manutenção e validações operacionais
+└── .github/workflows/           # CI, build e deploy
 ```
 
 ## Operação
@@ -129,7 +128,7 @@ O repositório começa pela documentação da arquitetura. A implementação ser
 - [ ] Inicializar o repositório Git e publicar no GitHub.
 - [ ] Provisionar a VPS com Docker e acesso via Tailscale.
 - [ ] Configurar Cloudflare e Traefik com Origin CA.
-- [ ] Subir PostgreSQL privado com backup automatizado.
+- [ ] Provisionar PostgreSQL em Bare Metal ([docs/postgres-bare-metal.md](docs/postgres-bare-metal.md)): install, pg_hba restrito à bridge, backup diário + restore testado.
 - [ ] Adicionar a stack frontend, backend FastAPI e migrations.
 - [ ] Configurar Komodo, runner self-hosted e GitHub Actions.
 - [ ] Configurar monitores e alertas no Uptime Kuma.
