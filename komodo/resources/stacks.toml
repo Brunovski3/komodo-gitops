@@ -1,0 +1,59 @@
+# Stacks das aplicações do host, gerenciadas via Resource Sync.
+#
+# Cada stack aponta pro compose deste repo; o Komodo faz o pull e compara
+# estado do container com o disco. deploy = false deixa o sync detectar
+# diffs sem aplicar (útil no primeiro import), mudando pra true depois.
+#
+# Referência: https://docs.rs/komodo_client/latest/komodo_client/entities/stack/struct.StackConfig.html
+
+[[stack]]
+name = "n8n"
+description = "Automação - imagem custom com Puppeteer + OCI CLI"
+tags = ["prod"]
+deploy = true # TODO: false até validar o primeiro sync
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "master"
+run_directory = "compose/n8n"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "glpi"
+description = "Gestão de ativos e chamados"
+tags = ["prod"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "master"
+run_directory = "compose/glpi"
+file_paths = ["docker-compose.yml"]
+
+[[stack]]
+name = "grafana"
+description = "Observabilidade - dashboards e alertas"
+tags = ["prod"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "master"
+run_directory = "compose/grafana"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "komodo"
+description = "Core + Mongo + Periphery (labels komodo.skip evitam auto-recursão)"
+tags = ["prod", "komodo"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "master"
+run_directory = "compose/komodo"
+file_paths = ["compose.yaml"]

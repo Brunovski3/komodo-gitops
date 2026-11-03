@@ -1,0 +1,21 @@
+services:
+  glpi:
+    image: glpi/glpi:latest
+    container_name: glpi_app
+    restart: always
+    environment:
+      TIMEZONE: "America/Sao_Paulo"
+      # Persistência no MySQL
+      GLPI_DB_HOST: "${GLPI_DB_HOST}"
+      GLPI_DB_PORT: "${GLPI_DB_PORT}"
+      GLPI_DB_NAME: "${GLPI_DB_NAME}"
+      GLPI_DB_USER: "${GLPI_DB_USER}"
+      GLPI_DB_PASSWORD: "${GLPI_DB_PASSWORD}"
+    ports:
+      - "80:80"
+    volumes:
+      - /data/services/glpi/var_glpi:/var/glpi
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - default

@@ -95,19 +95,35 @@ flowchart TB
 - Segredos ficam fora do Git: `.env`, tokens, certificados, chaves e backups são ignorados.
 - Imagens, dependências e workflows devem ser versionados e revisados antes do deploy.
 
-## Estrutura planejada
+## Estrutura (o repo é A fonte que o Komodo aponta)
 
 ```text
 .
-├── compose/                     # Stacks Docker por serviço (VPS)
-│   ├── traefik/
-│   ├── monitoring/
-│   └── application/
+├── compose/                   # stacks por serviço — o que o Komodo pulla
+│   ├── n8n/                   # compose.yaml + Dockerfile (imagem custom com Puppeteer/OCI CLI)
+│   ├── glpi/                  # docker-compose.yml (GLPI)
+│   ├── grafana/               # compose.yaml (observabilidade)
+│   ├── komodo/                # core + mongo + periphery (o gerente de stacks, com komodo.skip)
+│   └── data/                  # volumes persistentes e scripts (.gitkeep / .env.example)
+│       └── services/n8n/scripts/
+├── komodo/                    # Resource Sync do Komodo (server, stacks e resource_sync TOML)
+│   ├── resources/
+│   │   ├── server.toml        # host da VPS via periphery (TODO: melhor preêncher antes)
+│   │   └── stacks.toml        # lê compose/<serviço>/ — aponta para ESTE repo
+│   ├── resource-sync.toml     # o própriozy sync
+│   └── README.md
 ├── docs/
-│   └── postgres-bare-metal.md   # PostgreSQL no host: install, pg_hba, backup, restore
-├── scripts/                     # Backup, manutenção e validações operacionais
-└── .github/workflows/           # CI, build e deploy
+│   └── postgres-bare-metal.md # PostgreSQL no host: install, pg_hba, backup, restore
+└── .github/workflows/         # CI, build e deploy
 ```
+
+## Fluxo GitOps
+
+1. Compose mudou no `compose/<serviço>/` → push.
+2. O **Resource Sync** (komodo/resource-sync.toml) poll这份Git no Komodo Core.
+3. Composes atualizam → Komodo registra diff e mostra o risco de estados divergir.
+4. Stacks updatadas — **simulable** ou executando o deploy no IDP.
+5. `komodo/README.md` determina osISTICS do primeiro seguindo a entry do sync (TODOサーバー).
 
 ## Operação
 

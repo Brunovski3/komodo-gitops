@@ -1,0 +1,19 @@
+# O próprio sync que carrega estes arquivos.
+#
+# No Komodo, crie um ResourceSync apontando pra este repo (ou importe este
+# recurso via UI): Core passa a poller este repo e alerta diffs a cada push.
+# O webhook do git pode executar o sync automaticamente em push na branch.
+#
+# Referência: https://docs.rs/komodo_client/latest/komodo_client/entities/sync/type.ResourceSync.html
+
+[[resource_sync]]
+name = "lab-devops-resources"
+description = "Sincroniza recursos declarados neste repo com a instância Komodo"
+[resource_sync.config]
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "master"
+resource_path = [
+  "komodo/resources/server.toml",
+  "komodo/resources/stacks.toml",
+]

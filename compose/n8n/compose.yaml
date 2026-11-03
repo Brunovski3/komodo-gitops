@@ -1,0 +1,44 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n_app
+    restart: always
+    ports:
+      - "5678:5678"
+
+    environment:
+      # Persistência no Postgres
+      DB_TYPE: "postgresdb"
+      DB_POSTGRESDB_HOST: "${POSTGRES_HOST}"
+      DB_POSTGRESDB_PORT: "${POSTGRES_PORT}"
+      DB_POSTGRESDB_DATABASE: "${POSTGRES_DB}"
+      DB_POSTGRESDB_USER: "${POSTGRES_USER}"
+      DB_POSTGRESDB_PASSWORD: "${POSTGRES_PASSWORD}"
+
+      # Politicas (fixas)
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: "168"
+      N8N_SECURE_COOKIE: "false"
+      NODES_EXCLUDE: "[]"
+
+      # Outros
+      TZ: "${TZ}"
+      GENERIC_TIMEZONE: "${TZ}"
+      NODE_FUNCTION_ALLOW_EXTERNAL: "puppeteer"
+      OCI_CLI_AUTH: "instance_principal"
+      T: "${T}"
+      WEBHOOK_URL: "${WEBHOOK_URL}"
+
+    volumes:
+      - "/data/services/n8n/n8n_data:/home/node/.n8n"
+      - "/data/services/n8n/scripts:/home/node/scripts"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+    networks:
+      - rede_automacao
+
+networks:
+  rede_automacao:
+    external: true
