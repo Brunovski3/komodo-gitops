@@ -20,19 +20,6 @@ run_directory = "compose/n8n"
 file_paths = ["compose.yaml"]
 
 [[stack]]
-name = "glpi"
-description = "Gestão de ativos e chamados"
-tags = ["prod"]
-deploy = false
-[stack.config]
-server = "lab-prod-01"
-git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
-branch = "master"
-run_directory = "compose/glpi"
-file_paths = ["docker-compose.yml"]
-
-[[stack]]
 name = "grafana"
 description = "Observabilidade - dashboards e alertas"
 tags = ["prod"]
