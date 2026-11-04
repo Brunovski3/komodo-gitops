@@ -101,7 +101,6 @@ flowchart TB
 .
 ├── compose/                   # stacks por serviço — o que o Komodo pulla
 │   ├── n8n/                   # compose.yaml + Dockerfile (imagem custom com Puppeteer/OCI CLI)
-│   ├── glpi/                  # docker-compose.yml (GLPI)
 │   ├── grafana/               # compose.yaml (observabilidade)
 │   ├── komodo/                # core + mongo + periphery (o gerente de stacks, com komodo.skip)
 │   └── data/                  # volumes persistentes e scripts (.gitkeep / .env.example)
@@ -122,7 +121,7 @@ flowchart TB
 1. Compose mudou no `compose/<serviço>/` → push.
 2. O **Resource Sync** (komodo/resource-sync.toml) poll这份Git no Komodo Core.
 3. Composes atualizam → Komodo registra diff e mostra o risco de estados divergir.
-4. Stacks updatadas — **simulable** ou executando o deploy no IDP.
+4. Stacks atualizadas — **simulable** ou executando o deploy no IDP.
 5. `komodo/README.md` determina osISTICS do primeiro seguindo a entry do sync (TODOサーバー).
 
 ## Operação
