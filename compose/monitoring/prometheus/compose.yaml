@@ -1,0 +1,32 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    container_name: prometheus
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      # tempo de retenção dos dados
+      - '--storage.tsdb.retention.time=30d'
+      # tamanho máximo do disco
+      - '--storage.tsdb.retention.size=5GB'
+      - '--web.enable-lifecycle'
+      - '--web.external-url=https://prometheus.example.local'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.yml:/etc/prometheus/alerts.yml:ro
+      - ./recording-rules.yml:/etc/prometheus/recording-rules.yml:ro
+      - /data/services/prometheus/secrets:/etc/prometheus/secrets:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${OBS_BIND_IP}:9090:9090"
+    networks:
+      - obs-net
+
+volumes:
+  prometheus_data:
+
+networks:
+  obs-net:
+    external: true

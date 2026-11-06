@@ -1,0 +1,5059 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "komodo-noc",
+    "namespace": "default",
+    "uid": "645f81dd-32a9-47e8-ac8a-514d7203aaaf",
+    "resourceVersion": "1792499523320446",
+    "generation": 5,
+    "creationTimestamp": "2026-07-24T13:15:34Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "4483622537449472"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:dfdfhjk15fu9sd",
+      "grafana.app/folder": "",
+      "grafana.app/saved-from-ui": "Grafana v13.0.1 (a100054f)",
+      "grafana.app/updatedBy": "user:dfdfhjk15fu9sd",
+      "grafana.app/updatedTimestamp": "2026-10-20T12:32:03Z"
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "spec": {}
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "NOC do Komodo — servidores, containers, stacks, capacidade, atividade e alertas.",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "id": 1,
+          "title": "Status Stacks em Tempo Real",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "running",
+                            "text": "Running",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "stopped",
+                            "text": "Stopped",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "down",
+                            "text": "Down",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unhealthy",
+                            "text": "Unhealthy",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unknown",
+                            "text": "Unknown",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetStacksSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Running"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Stopped"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "yellow",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Down"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unhealthy"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unknown"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "dark-purple",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-10": {
+        "kind": "Panel",
+        "spec": {
+          "id": 10,
+          "title": "Load Average — ${server}",
+          "description": "GetSystemStats — load_average 1m/5m/15m",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "load_average.one",
+                            "text": "Load 1m",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "load_average.five",
+                            "text": "Load 5m",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "load_average.fifteen",
+                            "text": "Load 15m",
+                            "type": "number"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "parser": "jq-backend",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetSystemStats",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"server\":\"${server}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 4,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 8,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "id": 11,
+          "title": "Discos — ${server}",
+          "description": "GetSystemStats — discos (root_selector: disks)",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "mount",
+                            "text": "Mount",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "file_system",
+                            "text": "FS",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "used_gb",
+                            "text": "Usado (GB)",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "total_gb",
+                            "text": "Total (GB)",
+                            "type": "number"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "parser": "backend",
+                        "root_selector": "disks",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetSystemStats",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"server\":\"${server}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "Usado (GB)"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Usado (GB)"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "decgbytes"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "gradient",
+                          "type": "color-background"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "yellow",
+                              "value": 100
+                            },
+                            {
+                              "color": "red",
+                              "value": 400
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total (GB)"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "decgbytes"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "id": 12,
+          "title": "CPU & Memória Histórico — ${server}",
+          "description": "GetHistoricalServerStats — série temporal",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "ts",
+                            "text": "Time",
+                            "type": "time"
+                          },
+                          {
+                            "selector": "cpu_perc",
+                            "text": "CPU %",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "mem_used_gb",
+                            "text": "Mem Usada (GB)",
+                            "type": "number"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "root_selector": "stats",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetHistoricalServerStats",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"server\":\"${server}\",\"granularity\":\"${granularity}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CPU %"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Mem Usada (GB)"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "decgbytes"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "right"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "id": 13,
+          "title": "Rede Histórico — ${server}",
+          "description": "GetHistoricalServerStats — ingress / egress em bytes",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "ts",
+                            "text": "Time",
+                            "type": "time"
+                          },
+                          {
+                            "selector": "network_ingress_bytes",
+                            "text": "Ingress",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "network_egress_bytes",
+                            "text": "Egress",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "stats",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetHistoricalServerStats",
+                        "url_options": {
+                          "data": "{\"server\":\"${server}\",\"granularity\":\"${granularity}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "binBps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Ingress"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Egress"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-14": {
+        "kind": "Panel",
+        "spec": {
+          "id": 14,
+          "title": "Histórico de Operações",
+          "description": "ListUpdates — quem fez o quê e quando",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "start_ts",
+                            "text": "Timestamp",
+                            "type": "time"
+                          },
+                          {
+                            "selector": "operation",
+                            "text": "Operação",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "username",
+                            "text": "Usuário",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "target.type",
+                            "text": "Tipo",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "target.id",
+                            "text": "Recurso",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "status",
+                            "text": "Status",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "success",
+                            "text": "Sucesso",
+                            "type": "boolean"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "updates",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListUpdates",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListServers",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Servers",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListStacks",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Stacks",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListProcedures",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Procedures",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListActions",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Actions",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListRepos",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Repos",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListResourceSyncs",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Syncs",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "merge",
+                  "spec": {
+                    "filter": {
+                      "id": "byRefId",
+                      "options": "Servers|Stacks|Procedures|Actions|Repos|Syncs"
+                    },
+                    "options": {
+                      "refId": "Nomes"
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "configFromData",
+                  "spec": {
+                    "options": {
+                      "configRefId": "merge-Servers-Stacks-Procedures-Actions-Repos-Syncs",
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "Recurso"
+                      },
+                      "mappings": [
+                        {
+                          "fieldName": "id",
+                          "handlerKey": "mappings.value"
+                        },
+                        {
+                          "fieldName": "name",
+                          "handlerKey": "mappings.text"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "Recurso"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Operação"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 220
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Usuário"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 130
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "type": "value",
+                            "options": {
+                              "000000000000000000000000": {
+                                "text": "Sistema",
+                                "color": "purple",
+                                "index": 0
+                              },
+                              "000000000000000000000001": {
+                                "text": "Sistema (Procedure)",
+                                "color": "purple",
+                                "index": 1
+                              },
+                              "000000000000000000000002": {
+                                "text": "Sistema (Action)",
+                                "color": "purple",
+                                "index": 2
+                              },
+                              "000000000000000000000003": {
+                                "text": "Sistema (Webhook Git)",
+                                "color": "purple",
+                                "index": 3
+                              },
+                              "000000000000000000000004": {
+                                "text": "Sistema (Auto Redeploy)",
+                                "color": "purple",
+                                "index": 4
+                              },
+                              "000000000000000000000005": {
+                                "text": "Sistema (Resource Sync)",
+                                "color": "purple",
+                                "index": 5
+                              },
+                              "000000000000000000000006": {
+                                "text": "Sistema (Stack Wizard)",
+                                "color": "purple",
+                                "index": 6
+                              },
+                              "000000000000000000000007": {
+                                "text": "Sistema (Build Manager)",
+                                "color": "purple",
+                                "index": 7
+                              },
+                              "000000000000000000000008": {
+                                "text": "Sistema (Repo Manager)",
+                                "color": "purple",
+                                "index": 8
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Tipo"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Recurso"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 220
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Sucesso"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "false": {
+                                "color": "red",
+                                "index": 1,
+                                "text": "✗ Falhou"
+                              },
+                              "true": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "✓ OK"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Status"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 110
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "Complete": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "Completo"
+                              },
+                              "InProgress": {
+                                "color": "blue",
+                                "index": 1,
+                                "text": "Em andamento"
+                              },
+                              "Queued": {
+                                "color": "yellow",
+                                "index": 2,
+                                "text": "Na fila"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "id": 15,
+          "title": "Taxa de Sucesso das Operações",
+          "description": "ListUpdates — groupBy success",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "success",
+                            "text": "Sucesso",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "operation",
+                            "text": "Operação",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "updates",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListUpdates",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "groupBy",
+                  "spec": {
+                    "options": {
+                      "fields": {
+                        "Operação": {
+                          "aggregations": [
+                            "count"
+                          ],
+                          "operation": "aggregate"
+                        },
+                        "Sucesso": {
+                          "aggregations": [],
+                          "operation": "groupby"
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "piechart",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
+                },
+                "sort": "desc",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "true"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Sucesso"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "false"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Falha"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-16": {
+        "kind": "Panel",
+        "spec": {
+          "id": 16,
+          "title": "GitOps — Syncs & Builds",
+          "description": "GetResourceSyncsSummary + GetBuildsSummary",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Syncs Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "ok",
+                            "text": "Syncs OK",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "pending",
+                            "text": "Syncs Pendente",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "failed",
+                            "text": "Syncs Falha",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetResourceSyncsSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Builds Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "ok",
+                            "text": "Builds OK",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "building",
+                            "text": "Builds Em andamento",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "failed",
+                            "text": "Builds Falha",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetBuildsSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "merge",
+                  "spec": {
+                    "options": {}
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": ".*Total.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": ".*OK.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": ".*Falha.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": ".*Pendente.*|.*andamento.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "yellow",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-17": {
+        "kind": "Panel",
+        "spec": {
+          "id": 17,
+          "title": "Alertas Ativos",
+          "description": "ListAlerts — body: {\"query\":{}}",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "ts",
+                            "text": "Timestamp",
+                            "type": "time"
+                          },
+                          {
+                            "selector": "level",
+                            "text": "Nível",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "resolved",
+                            "text": "Resolvido",
+                            "type": "boolean"
+                          },
+                          {
+                            "selector": "target.type",
+                            "text": "Tipo",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "data.data.name",
+                            "text": "Recurso",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "data.type",
+                            "text": "Alerta",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "alerts",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListAlerts",
+                        "url_options": {
+                          "data": "{\"query\":{}}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "Timestamp"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Nível"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 110
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "CRITICAL": {
+                                "color": "red",
+                                "index": 0,
+                                "text": "CRITICAL"
+                              },
+                              "OK": {
+                                "color": "green",
+                                "index": 2,
+                                "text": "OK"
+                              },
+                              "WARNING": {
+                                "color": "yellow",
+                                "index": 1,
+                                "text": "WARNING"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Resolvido"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 100
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "false": {
+                                "color": "red",
+                                "index": 1,
+                                "text": "Aberto"
+                              },
+                              "true": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "Resolvido"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Alerta"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 200
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Tipo"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Recurso"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 220
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-18": {
+        "kind": "Panel",
+        "spec": {
+          "id": 18,
+          "title": "Agendamentos (Schedules)",
+          "description": "ListSchedules — procedures com schedule configurado",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "name",
+                            "text": "Nome",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "schedule",
+                            "text": "Schedule (CRON)",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "enabled",
+                            "text": "Ativo",
+                            "type": "boolean"
+                          },
+                          {
+                            "selector": "last_run_at",
+                            "text": "Lastrun",
+                            "type": "timestamp_epoch"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListSchedules",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": false,
+                    "displayName": "Nome"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Nome"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 200
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Schedule (CRON)"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 220
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Ativo"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "false": {
+                                "color": "gray",
+                                "index": 1,
+                                "text": "Desativado"
+                              },
+                              "true": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "Ativo"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-19": {
+        "kind": "Panel",
+        "spec": {
+          "id": 19,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<!DOCTYPE html> <html lang=\"pt-br\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> <!-- Fonte Bebas Neue --> <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"> <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin> <link href=\"https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap\" rel=\"stylesheet\"> <style> /* Ajustes básicos para ocupar toda a área */ html, body { height: 100%; width: 100%; margin: 0; padding: 0; box-sizing: border-box; /* Fundo gradiente azul escuro no estilo lab */ background: radial-gradient( circle, rgba(10,10,40,0.9) 0%, /* azul escuro com brilho leve no centro */ rgba(20,30,70,0.7) 60%, /* azul profundo intermediário */ rgba(0,0,0,1) 100% /* preto nas bordas */ ); } .css-1kfgvg7-thead { color: #FFFFFF; background: linear-gradient(180deg, #429e8a 20%, #133e5c 50%); padding: 0; border-radius: 1rem 1rem 0 0; border-top: 1px solid rgba(0, 99, 4, 0.12); border-left: 1px solid rgba(204, 204, 220, 0.12); border-right: 1px solid rgba(204, 204, 220, 0.12); } /*AQUI MUDA O FUNDO SEM TRANSPARENCIA-----------------------------------*/ .css-kkenh-panel-container-panel-transparent-container { background: radial-gradient( circle at bottom center, rgba(79, 155, 255, 0.2) 0%, /* mancha branca translúcida no centro inferior */ rgba(255, 255, 255, 0) 60% /* suaviza para transparente */ ), rgba(0, 0, 0, 0.5); color: white; border-radius: 1rem; } /* BACKGROUND DO TABLE */ .css-kuoxoh-panel-content { background: rgba(0, 0, 0, 0.2); color: white; border-radius: 1rem; padding: 1rem; } .css-1uir88 { font-family: \"Bebas Neue\", sans-serif; font-weight: 400; font-size: 1.5rem; } .css-1hqhlx3-cellContainerOverflow { background-color: rgba(10, 30, 33, 1); } .css-1kxk3wv-cellContainerOverflow { background-color: rgba(0, 0, 0, 1); } .css-8fjwhi-row { border: 1px solid rgba(14, 235, 255, 0.30); } .css-1rkhn60-cellContainerOverflow { border: 1px solid rgba(245, 1, 27, 1); border-radius: 0.5rem 0 0 0.5rem; } .css-1rkhn60-cellContainerOverflow:last-child:not(:only-child) { border-right: 1px solid rgba(245, 1, 27, 1); border-radius: 0 0.5rem 0.5rem 0; } .css-8fjwhi-row:last-child { border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0 0 1rem 1rem; background-color: rgba(10, 30, 33, 1); font-family: \"Bebas Neue\", sans-serif; font-weight: 400; font-size: 1.5rem; } /*SESSÃO BORDER-RIGHT DO TABLE*/ .css-16kvirq-cellContainerOverflow, .css-1rpyjoq-cellContainerOverflow, .css-ibk5ji-cellContainerOverflow, .css-twuzn4-cellContainerOverflow, .css-1b7w6n1-cellContainerOverflow, .css-1xyxswu-cellContainerOverflow, .css-1iuzmzq-cellContainerOverflow, .css-10876x5-cellContainerOverflow, .css-3345nh-cellContainerOverflow { border-right: 1px solid rgba(255, 255, 255, 0.2); color: white; } </style> </head> </html>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "Distribuição de Saúde das Stacks",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "running",
+                            "text": "Running",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "stopped",
+                            "text": "Stopped",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "down",
+                            "text": "Down",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unhealthy",
+                            "text": "Unhealthy",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetStacksSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "piechart",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "/^(?!.*Total).*$/",
+                  "values": false
+                },
+                "sort": "desc",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Running"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Stopped"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Down"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "dark-blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unhealthy"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "dark-red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-20": {
+        "kind": "Panel",
+        "spec": {
+          "id": 20,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<div style=\"display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 8px\"><div><div style=\"font-size:28px;font-weight:600;line-height:1.1\">Komodo · NOC</div><div style=\"opacity:.65;font-size:14px;margin-top:4px\">Stacks, servidores, operações, alertas e GitOps — dados da API do Komodo, atualizados a cada minuto</div></div><a href=\"https://komodo.example.local\" target=\"_blank\" style=\"padding:8px 16px;border-radius:6px;border:1px solid rgba(128,128,128,.4);text-decoration:none;font-weight:500\">Abrir o Komodo ↗</a></div>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "Todas as Stacks (Busca e Filtro Avançado)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "name",
+                            "text": "Stack",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.state",
+                            "text": "Status",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.server_id",
+                            "text": "Servidor",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.deployed_hash",
+                            "text": "Hash",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.repo",
+                            "text": "Repo",
+                            "type": "string"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListStacks",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "name",
+                            "type": "string"
+                          }
+                        ],
+                        "format": "table",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListServers",
+                        "url_options": {
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "Servers",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "configFromData",
+                  "spec": {
+                    "options": {
+                      "configRefId": "Servers",
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "Servidor"
+                      },
+                      "mappings": [
+                        {
+                          "fieldName": "id",
+                          "handlerKey": "mappings.value"
+                        },
+                        {
+                          "fieldName": "name",
+                          "handlerKey": "mappings.text"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "md",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": false,
+                    "displayName": "Status"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 100
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Stack"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 250
+                      },
+                      {
+                        "id": "custom.align",
+                        "value": "left"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Status"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 140
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "created": {
+                                "color": "blue",
+                                "index": 7,
+                                "text": "Created"
+                              },
+                              "dead": {
+                                "color": "dark-red",
+                                "index": 5,
+                                "text": "Dead"
+                              },
+                              "deploying": {
+                                "color": "light-blue",
+                                "index": 9,
+                                "text": "Deploying"
+                              },
+                              "down": {
+                                "color": "red",
+                                "index": 2,
+                                "text": "Down"
+                              },
+                              "paused": {
+                                "color": "blue",
+                                "index": 6,
+                                "text": "Paused"
+                              },
+                              "removing": {
+                                "color": "purple",
+                                "index": 8,
+                                "text": "Removing"
+                              },
+                              "restarting": {
+                                "color": "orange",
+                                "index": 4,
+                                "text": "Restarting"
+                              },
+                              "running": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "Running"
+                              },
+                              "stopped": {
+                                "color": "yellow",
+                                "index": 1,
+                                "text": "Stopped"
+                              },
+                              "unhealthy": {
+                                "color": "orange",
+                                "index": 3,
+                                "text": "Unhealthy"
+                              },
+                              "unknown": {
+                                "color": "gray",
+                                "index": 10,
+                                "text": "Unknown"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Hash"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 100
+                      },
+                      {
+                        "id": "custom.align",
+                        "value": "center"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Server"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 200
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "Saúde dos Servidores",
+          "description": "GetServersSummary",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "healthy",
+                            "text": "Healthy",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "warning",
+                            "text": "Warning",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unhealthy",
+                            "text": "Unhealthy",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "disabled",
+                            "text": "Disabled",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetServersSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Healthy"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Warning"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "yellow",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unhealthy"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Disabled"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "gray",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "Containers Docker",
+          "description": "GetDockerContainersSummary",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "running",
+                            "text": "Running",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "stopped",
+                            "text": "Stopped",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unhealthy",
+                            "text": "Unhealthy",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unknown",
+                            "text": "Unknown",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetDockerContainersSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Running"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Stopped"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "yellow",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unhealthy"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Unknown"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "gray",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "id": 8,
+          "title": "CPU — ${server}",
+          "description": "GetSystemStats — tempo real",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "cpu_perc",
+                            "text": "CPU %",
+                            "type": "number"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "json_options": {
+                          "columnar": false,
+                          "root_is_not_array": true
+                        },
+                        "parser": "jq-backend",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetSystemStats",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"server\":\"${server}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "gauge",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "barShape": "flat",
+                "barWidthFactor": 0.5,
+                "effects": {
+                  "barGlow": false,
+                  "centerGlow": false,
+                  "gradient": true
+                },
+                "endpointMarker": "point",
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "segmentCount": 1,
+                "segmentSpacing": 0.3,
+                "shape": "gauge",
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto",
+                "sparkline": true,
+                "textMode": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percent",
+                  "min": 0,
+                  "max": 100,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 70,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 90,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "id": 9,
+          "title": "Memória — ${server}",
+          "description": "GetSystemStats — mem_used_gb / mem_total_gb",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "mem_used_gb",
+                            "text": "Usada (GB)",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "mem_total_gb",
+                            "text": "Total (GB)",
+                            "type": "number"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "json_options": {
+                          "columnar": false,
+                          "root_is_not_array": true
+                        },
+                        "parser": "jq-backend",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetSystemStats",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"server\":\"${server}\"}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decgbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "blue"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "blue"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Usada (GB)"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total (GB)"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-21": {
+        "kind": "Panel",
+        "spec": {
+          "id": 21,
+          "title": "Actions",
+          "description": "GetActionsSummary — estado da última execução de cada Action",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "ok",
+                            "text": "Ok",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "running",
+                            "text": "Rodando",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "failed",
+                            "text": "Falharam",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unknown",
+                            "text": "Nunca rodaram",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetActionsSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        },
+                        "root_selector": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "blue"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Ok"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "green"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Rodando"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "light-blue"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Falharam"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "red"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Nunca rodaram"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "gray"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-22": {
+        "kind": "Panel",
+        "spec": {
+          "id": 22,
+          "title": "Procedures",
+          "description": "GetProceduresSummary — estado da última execução de cada Procedure",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "total",
+                            "text": "Total",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "ok",
+                            "text": "Ok",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "running",
+                            "text": "Rodando",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "failed",
+                            "text": "Falharam",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "unknown",
+                            "text": "Nunca rodaram",
+                            "type": "number"
+                          }
+                        ],
+                        "format": "table",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/GetProceduresSummary",
+                        "url_options": {
+                          "data": "{}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        },
+                        "root_selector": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "text"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "blue"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Ok"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "green"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Rodando"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "light-blue"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Falharam"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "red"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Nunca rodaram"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "gray"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-23": {
+        "kind": "Panel",
+        "spec": {
+          "id": 23,
+          "title": "Actions",
+          "description": "ListActions — última execução e próximo agendamento",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "Action",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.state",
+                            "text": "Última execução",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.last_run_at",
+                            "text": "Rodou em",
+                            "type": "timestamp_epoch"
+                          },
+                          {
+                            "selector": "info.next_scheduled_run",
+                            "text": "Próxima",
+                            "type": "timestamp_epoch"
+                          },
+                          {
+                            "selector": "info.schedule_error",
+                            "text": "Erro no agendamento",
+                            "type": "string"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListActions",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "displayName": "Action",
+                    "desc": false
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "id"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hidden",
+                        "value": true
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Action"
+                    },
+                    "properties": [
+                      {
+                        "id": "links",
+                        "value": [
+                          {
+                            "title": "Abrir no Komodo",
+                            "url": "https://komodo.example.local/actions/${__data.fields.id}",
+                            "targetBlank": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Última execução"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 140
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "type": "value",
+                            "options": {
+                              "Ok": {
+                                "text": "Ok",
+                                "color": "green",
+                                "index": 0
+                              },
+                              "Failed": {
+                                "text": "Falhou",
+                                "color": "red",
+                                "index": 1
+                              },
+                              "Running": {
+                                "text": "Rodando",
+                                "color": "blue",
+                                "index": 2
+                              },
+                              "Unknown": {
+                                "text": "Nunca rodou",
+                                "color": "gray",
+                                "index": 3
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Rodou em"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "dateTimeFromNow"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Próxima"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "dateTimeFromNow"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-24": {
+        "kind": "Panel",
+        "spec": {
+          "id": 24,
+          "title": "Procedures",
+          "description": "ListProcedures — última execução e próximo agendamento",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "yesoreyeram-infinity-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "cfszocpznwn40a"
+                      },
+                      "spec": {
+                        "columns": [
+                          {
+                            "selector": "id",
+                            "text": "id",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "name",
+                            "text": "Procedure",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.state",
+                            "text": "Última execução",
+                            "type": "string"
+                          },
+                          {
+                            "selector": "info.stages",
+                            "text": "Etapas",
+                            "type": "number"
+                          },
+                          {
+                            "selector": "info.last_run_at",
+                            "text": "Rodou em",
+                            "type": "timestamp_epoch"
+                          },
+                          {
+                            "selector": "info.next_scheduled_run",
+                            "text": "Próxima",
+                            "type": "timestamp_epoch"
+                          },
+                          {
+                            "selector": "info.schedule_error",
+                            "text": "Erro no agendamento",
+                            "type": "string"
+                          }
+                        ],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "${KOMODO_URL}/read/ListProcedures",
+                        "url_options": {
+                          "body_content_type": "text/plain",
+                          "body_type": "raw",
+                          "data": "{\"limit\":0}",
+                          "headers": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "method": "POST"
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "displayName": "Procedure",
+                    "desc": false
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 80
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "id"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hidden",
+                        "value": true
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Procedure"
+                    },
+                    "properties": [
+                      {
+                        "id": "links",
+                        "value": [
+                          {
+                            "title": "Abrir no Komodo",
+                            "url": "https://komodo.example.local/procedures/${__data.fields.id}",
+                            "targetBlank": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Última execução"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 140
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "type": "value",
+                            "options": {
+                              "Ok": {
+                                "text": "Ok",
+                                "color": "green",
+                                "index": 0
+                              },
+                              "Failed": {
+                                "text": "Falhou",
+                                "color": "red",
+                                "index": 1
+                              },
+                              "Running": {
+                                "text": "Rodando",
+                                "color": "blue",
+                                "index": 2
+                              },
+                              "Unknown": {
+                                "text": "Nunca rodou",
+                                "color": "gray",
+                                "index": 3
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Etapas"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Rodou em"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "dateTimeFromNow"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Próxima"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "dateTimeFromNow"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "RowsLayout",
+      "spec": {
+        "rows": [
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Saúde de Infra (Servidores → Containers)",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 24,
+                        "height": 3,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-20"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 3,
+                        "width": 12,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-5"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 3,
+                        "width": 12,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-6"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Visão Panorâmica (NOC — Stacks)",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 16,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-1"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 16,
+                        "y": 0,
+                        "width": 5,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 21,
+                        "y": 0,
+                        "width": 3,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-19"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Actions & Procedures",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 12,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-21"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 0,
+                        "width": 12,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-22"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 5,
+                        "width": 12,
+                        "height": 9,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-23"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 5,
+                        "width": 12,
+                        "height": 9,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-24"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Capacidade por Servidor (${server})",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 4,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 4,
+                        "y": 0,
+                        "width": 6,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 10,
+                        "y": 0,
+                        "width": 6,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-10"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 16,
+                        "y": 0,
+                        "width": 8,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-11"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 5,
+                        "width": 14,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 14,
+                        "y": 5,
+                        "width": 10,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-13"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Atividade & Deploys (GitOps)",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 14,
+                        "height": 13,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-14"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 14,
+                        "y": 0,
+                        "width": 10,
+                        "height": 5,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-15"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 14,
+                        "y": 5,
+                        "width": 10,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-16"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Alertas & Agendamentos",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 15,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-17"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 15,
+                        "y": 0,
+                        "width": 9,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-18"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Inventário Detalhado",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 24,
+                        "height": 12,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-4"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "komodo",
+      "infra",
+      "mega-dash",
+      "noc"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-3h",
+      "to": "now",
+      "autoRefresh": "30s",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Komodo — NOC",
+    "variables": [
+      {
+        "kind": "DatasourceVariable",
+        "spec": {
+          "name": "DS_KOMODO",
+          "pluginId": "yesoreyeram-infinity-datasource",
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "current": {
+            "text": "Komodo (Infinity)",
+            "value": "cfszocpznwn40a"
+          },
+          "options": [],
+          "multi": false,
+          "includeAll": false,
+          "label": "Komodo Datasource",
+          "hide": "dontHide",
+          "skipUrlSync": false,
+          "allowCustomValue": true
+        }
+      },
+      {
+        "kind": "TextVariable",
+        "spec": {
+          "name": "KOMODO_URL",
+          "current": {
+            "text": "http://<IP_CORE>:9120",
+            "value": "http://<IP_CORE>:9120"
+          },
+          "query": "http://<IP_CORE>:9120",
+          "label": "Komodo URL",
+          "hide": "dontHide",
+          "skipUrlSync": false
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "name": "server",
+          "current": {
+            "text": "lab-RP-OPSINTERNO-CORE",
+            "value": "lab-RP-OPSINTERNO-CORE"
+          },
+          "label": "Servidor",
+          "hide": "dontHide",
+          "refresh": "onDashboardLoad",
+          "skipUrlSync": false,
+          "query": {
+            "kind": "DataQuery",
+            "group": "yesoreyeram-infinity-datasource",
+            "version": "v0",
+            "datasource": {
+              "name": "cfszocpznwn40a"
+            },
+            "spec": {
+              "columns": [
+                {
+                  "selector": "name",
+                  "text": "name",
+                  "type": "string"
+                }
+              ],
+              "format": "table",
+              "infinityQuery": {
+                "columns": [],
+                "computed_columns": [],
+                "data": "values\nfoo\nbar\nbaz",
+                "filters": [],
+                "format": "table",
+                "parser": "backend",
+                "refId": "",
+                "root_selector": "",
+                "source": "url",
+                "type": "json",
+                "url": "${KOMODO_URL}/read/ListServers",
+                "url_options": {
+                  "body_content_type": "application/json",
+                  "body_form": [],
+                  "body_type": "none",
+                  "data": "{}",
+                  "headers": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "method": "POST"
+                }
+              },
+              "meta": {
+                "textField": "name",
+                "valueField": "name"
+              },
+              "queryType": "infinity",
+              "refId": "variable",
+              "source": "url",
+              "type": "json",
+              "url": "${KOMODO_URL}/read/ListServers",
+              "url_options": {
+                "data": "{}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST"
+              }
+            }
+          },
+          "regex": "",
+          "regexApplyTo": "value",
+          "sort": "alphabeticalAsc",
+          "definition": "",
+          "options": [],
+          "multi": false,
+          "includeAll": false,
+          "allowCustomValue": false
+        }
+      },
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "name": "granularity",
+          "query": "1-min,5-min,15-min,1-hr",
+          "current": {
+            "text": "15-min",
+            "value": "15-min"
+          },
+          "options": [],
+          "multi": false,
+          "includeAll": false,
+          "label": "Granularidade Histórico",
+          "hide": "dontHide",
+          "skipUrlSync": false,
+          "allowCustomValue": false,
+          "valuesFormat": "csv"
+        }
+      }
+    ]
+  }
+}

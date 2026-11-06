@@ -1,0 +1,93 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+  - /etc/prometheus/recording-rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "traefik-internal"
+    static_configs:
+      - targets: ["<IP_CORE>:8082"]
+        labels:
+          host: core
+          origin_prometheus: lab-interno
+
+  - job_name: "traefik-ext"
+    static_configs:
+      - targets: ["<IP_LB_EXT>:8082"]
+        labels:
+          host: lbexterno
+          origin_prometheus: lab-interno
+
+  - job_name: "node"
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/node_exporter_password
+    static_configs:
+      - targets: ["<IP_CORE>:9100"]
+        labels:
+          host: core
+          origin_prometheus: lab-interno
+      - targets: ["<IP_OBS>:9100"]
+        labels:
+          host: obs
+          origin_prometheus: lab-interno
+      - targets: ["<IP_HOST_3>:9100"]
+        labels:
+          host: glpi-new
+          origin_prometheus: lab-interno
+      - targets: ["<IP_HOST_4>:9100"]
+        labels:
+          host: apps
+          origin_prometheus: lab-interno
+      - targets: ["<IP_LB_EXT>:9100"]
+        labels:
+          host: lbexterno
+          origin_prometheus: lab-interno
+
+  - job_name: "blackbox-http"
+    metrics_path: /probe
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    params:
+      module: [http_interno]
+    static_configs:
+      - targets:
+          - https://grafana.example.local
+          - https://prometheus.example.local
+          - https://alertmanager.example.local
+          - https://n8n.example.local
+          - https://glpi.example.local
+          - https://fpahub.example.local
+          - https://fpahub-api.example.local
+          - https://sales-hub.example.local
+          - https://sales-hub-api.example.local
+          - https://minio-ops.example.local
+          - https://minio-console.example.local
+          - https://desk-engenharia.example.local
+          - https://traefik.example.local
+          - https://traefik-ext.example.local
+          - https://auth.example.local
+        labels:
+          origin_prometheus: lab-interno
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115

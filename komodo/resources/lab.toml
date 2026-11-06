@@ -8,7 +8,7 @@
 
 [[server]]
 name = "lab-prod-01" # TODO: nome do servidor como registrado no Komodo
-description = "Bare metal prod - n8n, GLPI, Grafana, Komodo"
+description = "Bare metal prod - n8n, Komodo, observabilidade"
 tags = ["prod", "lab"]
 [server.config]
 address = "http://TODO:8120" # TODO: endereço do periphery
@@ -30,21 +30,99 @@ deploy = true # TODO: false até validar o primeiro sync
 server = "lab-prod-01"
 git_provider = "github.com"
 repo = "Brunovski3/devops-homelab"
-branch = "master"
+branch = "main"
 run_directory = "compose/n8n"
 file_paths = ["compose.yaml"]
 
 [[stack]]
 name = "grafana"
-description = "Observabilidade - dashboards e alertas"
-tags = ["prod"]
+description = "Observabilidade - dashboards, LDAP/OAuth"
+tags = ["prod", "monitoring"]
 deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
 repo = "Brunovski3/devops-homelab"
-branch = "master"
-run_directory = "compose/grafana"
+branch = "main"
+run_directory = "compose/monitoring/grafana"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "prometheus"
+description = "Observabilidade - coleta de metricas e regras de alerta"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/prometheus"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "loki"
+description = "Observabilidade - armazenamento de logs"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/loki"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "alloy"
+description = "Observabilidade - coleta de logs (containers + journald)"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/alloy"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "alertmanager"
+description = "Observabilidade - roteamento de alertas (webhook Cliq)"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/alertmanager"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "node-exporter"
+description = "Observabilidade - metricas de sistema do host"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/node-exporter"
+file_paths = ["compose.yaml"]
+
+[[stack]]
+name = "blackbox"
+description = "Observabilidade - probes HTTP dos endpoints"
+tags = ["prod", "monitoring"]
+deploy = false
+[stack.config]
+server = "lab-prod-01"
+git_provider = "github.com"
+repo = "Brunovski3/devops-homelab"
+branch = "main"
+run_directory = "compose/monitoring/blackbox"
 file_paths = ["compose.yaml"]
 
 [[stack]]
@@ -56,6 +134,6 @@ deploy = false
 server = "lab-prod-01"
 git_provider = "github.com"
 repo = "Brunovski3/devops-homelab"
-branch = "master"
+branch = "main"
 run_directory = "compose/komodo"
 file_paths = ["compose.yaml"]

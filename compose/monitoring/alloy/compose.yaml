@@ -1,0 +1,54 @@
+name: alloy
+
+services:
+  alloy:
+    image: grafana/alloy:v1.11.3
+    container_name: alloy
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    user: root
+
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+
+    command:
+      - 'run'
+      - '--server.http.listen-addr=0.0.0.0:12345'
+      - '--storage.path=/var/lib/alloy/data'
+      - '/etc/alloy/config.alloy'
+
+    environment:
+      HOST_LABEL: '${HOST_LABEL}'
+      LOKI_URL: '${LOKI_URL}'
+
+    volumes:
+      - /data/services/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /data/services/alloy/data:/var/lib/alloy/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/systemd/journal:/run/systemd/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/12345 && printf 'GET /-/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - alloy-net
+
+networks:
+  alloy-net:
+    driver: bridge

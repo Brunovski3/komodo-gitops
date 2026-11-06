@@ -1,0 +1,54 @@
+groups:
+  - name: log
+    interval: 1m
+    rules:
+      - alert: ContainerOOMKilled
+        expr: >
+          sum by (host, container) (
+            count_over_time({job="docker"} |~ "(?i)(oom.?kill|out of memory)" [5m])
+          ) > 0
+        labels:
+          severity: critical
+        annotations:
+          titulo: "CONTAINER MORTO POR FALTA DE MEMÓRIA"
+          summary: "{{ $labels.host }} registrou OOM no container {{ $labels.container }}"
+          description: "Verificar mem_limit do container e pressao de memoria no host."
+
+      - alert: PostgresFatal
+        expr: >
+          sum by (host, container) (
+            count_over_time({job="docker", container=~".*postgres.*"} |= "FATAL" [5m])
+          ) > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          titulo: "POSTGRES REGISTRANDO ERROS FATAIS"
+          summary: "{{ $labels.host }} com {{ $value | printf \"%.0f\" }} linhas FATAL em 5 min ({{ $labels.container }})"
+          description: "Conferir autenticacao, limite de conexao e espaco em disco."
+
+      - alert: TraefikErro5xx
+        expr: >
+          sum by (host) (
+            count_over_time({job="docker", container=~"traefik.*"} |= "\"DownstreamStatus\":5" [5m])
+          ) > 20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          titulo: "TRAEFIK RESPONDENDO 5XX EM VOLUME"
+          summary: "{{ $labels.host }} com {{ $value | printf \"%.0f\" }} respostas 5xx em 5 min"
+          description: "Backend fora do ar ou sobrecarregado. Conferir a stack de destino."
+
+      - alert: SSHFalhaAutenticacao
+        expr: >
+          sum by (host) (
+            count_over_time({job="systemd-journal", unit="sshd.service"} |= "Failed password" [5m])
+          ) > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          titulo: "TENTATIVAS DE LOGIN SSH FALHANDO EM VOLUME"
+          summary: "{{ $labels.host }} com {{ $value | printf \"%.0f\" }} falhas de senha em 5 min"
+          description: "Possivel forca bruta. Conferir origem com: journalctl -u sshd | grep 'Failed password'."

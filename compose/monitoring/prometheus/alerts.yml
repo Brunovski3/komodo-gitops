@@ -1,0 +1,207 @@
+groups:
+  - name: host
+    rules:
+      - alert: HostDown
+        expr: up{job="node"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: node-exporter
+        annotations:
+          summary: "Host sem resposta"
+          target: "{{ $labels.host }}"
+          description: "node-exporter inalcançável há 2 min. Host caído, Docker parado ou porta 9100 bloqueada."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostLowMemory
+        expr: >
+          (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          source: node-exporter
+        annotations:
+          summary: "Memória quase esgotada"
+          target: "{{ $labels.host }}"
+          description: "Uso em {{ $value | printf \"%.0f\" }}% há 5 min. Verificar containers sem mem_limit."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostOomKill
+        expr: increase(node_vmstat_oom_kill[10m]) > 0
+        labels:
+          severity: critical
+          source: node-exporter
+        annotations:
+          summary: "Processo encerrado por falta de memória"
+          target: "{{ $labels.host }}"
+          description: "{{ $value | printf \"%.0f\" }} OOM kill(s) nos últimos 10 min. Ver: dmesg -T | grep -i oom"
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostSwapping
+        expr: >
+          rate(node_vmstat_pswpin[5m]) + rate(node_vmstat_pswpout[5m]) > 100
+        for: 10m
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "Swap em uso contínuo"
+          target: "{{ $labels.host }}"
+          description: "{{ $value | printf \"%.0f\" }} páginas/s há 10 min. RAM insuficiente para a carga atual."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostHighCpu
+        expr: >
+          100 - (avg by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 15m
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "CPU saturada"
+          target: "{{ $labels.host }}"
+          description: "Uso em {{ $value | printf \"%.0f\" }}% há 15 min."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node"
+
+      - alert: HostDiskSpaceLow
+        expr: >
+          (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+               / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "Disco acima de 85%"
+          target: "{{ $labels.host }} · {{ $labels.mountpoint }}"
+          description: "Uso em {{ $value | printf \"%.0f\" }}%. Em Oracle Linux, avaliar remoção do /var/oled."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostDiskWillFillIn24h
+        expr: >
+          predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}[6h], 24*3600) < 0
+          and
+          node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"} < 0.20
+          and
+          node_filesystem_readonly{fstype!~"tmpfs|overlay"} == 0
+        for: 1h
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "Disco deve encher em menos de 24h"
+          target: "{{ $labels.host }} · {{ $labels.mountpoint }}"
+          description: "Menos de 20% livre e crescendo no ritmo das últimas 6h."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+      - alert: HostSystemdUnitFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "Serviço do systemd em falha"
+          target: "{{ $labels.host }} · {{ $labels.name }}"
+          description: "Ver: systemctl status {{ $labels.name }}"
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"
+
+  - name: endpoint
+    rules:
+      - alert: EndpointDown
+        expr: probe_success{job="blackbox-http"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: blackbox
+        annotations:
+          summary: "Serviço não responde"
+          target: "{{ $labels.instance }}"
+          description: "Sonda HTTP a partir do OBS falhando há 2 min. Verificar Traefik, DNS e backend."
+          dashboard: "https://grafana.example.local/d/2b34291d-a095-4171-935f-7dd4e5328ae1"
+
+      - alert: CertificateExpiringSoon
+        expr: (min(probe_ssl_earliest_cert_expiry{job="blackbox-http"}) - time()) / 86400 < 30
+        for: 1h
+        labels:
+          severity: warning
+          source: blackbox
+        annotations:
+          summary: "Certificado vence em {{ $value | printf \"%.0f\" }} dias"
+          target: "*.example.local"
+          description: "Renovar o wildcard e substituir em /data/services/traefik/certs."
+          dashboard: "https://grafana.example.local/d/2b34291d-a095-4171-935f-7dd4e5328ae1"
+
+  - name: backup
+    rules:
+      - alert: PostgresBackupFailed
+        expr: pg_backup_last_run_success == 0
+        labels:
+          severity: critical
+          source: pg-backup
+        annotations:
+          summary: "Backup do Postgres falhou"
+          target: "{{ $labels.host }}"
+          description: "Erro na última rodada. Ver: journalctl -u pg-backup.service -n 50"
+          dashboard: "https://grafana.example.local/d/lab-pg-backup?var-host={{ $labels.host }}"
+
+      - alert: PostgresBackupStale
+        expr: time() - pg_backup_last_run_timestamp_seconds > 26 * 3600
+        for: 10m
+        labels:
+          severity: critical
+          source: pg-backup
+        annotations:
+          summary: "Backup do Postgres atrasado"
+          target: "{{ $labels.host }}"
+          description: "Última rodada há {{ $value | humanizeDuration }}. O timer roda às 21:00. Ver: systemctl list-timers pg-backup.timer"
+          dashboard: "https://grafana.example.local/d/lab-pg-backup?var-host={{ $labels.host }}"
+
+      - alert: PostgresBackupUploadFailed
+        expr: pg_backup_upload_success == 0
+        labels:
+          severity: critical
+          source: pg-backup
+        annotations:
+          summary: "Cópia do backup para o bucket falhou"
+          target: "{{ $labels.host }}"
+          description: "Dump local ok, envio para o Object Storage falhou. Ver: journalctl -u pg-backup.service -n 50"
+          dashboard: "https://grafana.example.local/d/lab-pg-backup?var-host={{ $labels.host }}"
+
+  - name: monitoring
+    rules:
+      - alert: BlackboxExporterDown
+        expr: absent(up{job="blackbox-http"} == 1)
+        for: 5m
+        labels:
+          severity: warning
+          source: prometheus
+        annotations:
+          summary: "Blackbox exporter sem resposta"
+          target: "obs"
+          description: "Sem o exporter, nenhum EndpointDown dispara. Verificar o container blackbox."
+
+      - alert: PostgresBackupMetricsMissing
+        expr: absent(pg_backup_last_run_timestamp_seconds{host="core"})
+        for: 30m
+        labels:
+          severity: warning
+          source: prometheus
+          host: core
+        annotations:
+          summary: "Métricas do backup do Postgres ausentes"
+          target: "core"
+          description: "pg_backup.prom ausente ou textfile collector desligado no node-exporter."
+
+      - alert: NodeTextfileScrapeError
+        expr: node_textfile_scrape_error == 1
+        for: 10m
+        labels:
+          severity: warning
+          source: node-exporter
+        annotations:
+          summary: "node-exporter não consegue ler métricas de arquivo"
+          target: "{{ $labels.host }}"
+          description: "Verificar a pasta /data/services/node-exporter/textfile e o formato dos .prom."
+          dashboard: "https://grafana.example.local/d/lab-node-exporter-detalhe?var-job=node&var-instance={{ $labels.instance }}"

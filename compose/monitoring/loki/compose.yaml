@@ -1,0 +1,46 @@
+name: loki
+
+services:
+  loki:
+    image: grafana/loki:3.5.1
+    container_name: loki
+    restart: unless-stopped
+    user: "10001:10001"
+    security_opt:
+      - no-new-privileges:true
+
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1.0
+
+    command:
+      - '-config.file=/etc/loki/config.yaml'
+      - '-target=all'
+
+    ports:
+      - "${OBS_BIND_IP}:3100:3100"
+
+    volumes:
+      - ./config.yaml:/etc/loki/config.yaml:ro
+      - ./rules:/loki/rules/fake:ro
+      - /data/services/loki:/loki
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - obs-net
+
+networks:
+  obs-net:
+    external: true

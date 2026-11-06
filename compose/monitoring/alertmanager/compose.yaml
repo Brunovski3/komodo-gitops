@@ -1,0 +1,32 @@
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    container_name: alertmanager
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=https://alertmanager.example.local'
+    ports:
+      - "${OBS_BIND_IP}:9093:9093"
+    volumes:
+      - /etc/komodo/repos/infra-observability/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - /data/services/alertmanager/secrets:/etc/alertmanager/secrets:ro
+      - alertmanager_data:/alertmanager
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - obs-net
+
+volumes:
+  alertmanager_data:
+
+networks:
+  obs-net:
+    external: true

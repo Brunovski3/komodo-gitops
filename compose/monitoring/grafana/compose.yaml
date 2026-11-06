@@ -1,0 +1,82 @@
+services:
+  grafana:
+    image: grafana/grafana-oss:13.0.1
+    container_name: grafana_app
+    restart: always
+    environment:
+      # Credenciais
+      GF_SECURITY_ADMIN_USER: '${GRAFANA_ADMIN_USER}'
+      GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_ADMIN_PASSWORD}'
+
+      # ----------------------------------------
+      # 1. Autenticação via LDAP (AD)
+      # ----------------------------------------
+      GF_AUTH_LDAP_ENABLED: 'true'
+      GF_AUTH_LDAP_CONFIG_FILE: '/etc/grafana/ldap.toml'
+      GF_LDAP_HOST: '${LDAP_HOST}'
+      GF_LDAP_BIND_PASSWORD: '${LDAP_BIND_PASSWORD}'
+      GF_LDAP_BIND_DN: '${LDAP_BIND_DN}'
+      GF_LDAP_ADMIN_GROUP: '${GRAFANA_ADMIN_GROUP}'
+      GF_LDAP_EDITOR_GROUP: '${GRAFANA_EDITOR_GROUP}'
+      GF_LDAP_VIEWER_GROUP: '${GRAFANA_VIEWER_GROUP}'
+
+      # ----------------------------------------
+      # 2. Autenticação via Authentik (OAuth)
+      # ----------------------------------------
+      GF_USERS_VIEWERS_CAN_EDIT: 'true'
+      GF_AUTH_GENERIC_OAUTH_ENABLED: 'true'
+      GF_AUTH_GENERIC_OAUTH_NAME: 'Authentik'
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: 'true'
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: '${AUTHENTIK_CLIENT_ID}'
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: '${AUTHENTIK_CLIENT_SECRET}'
+      GF_AUTH_GENERIC_OAUTH_SCOPES: 'openid email profile'
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: 'https://auth.example.local/application/o/authorize/'
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: 'https://auth.example.local/application/o/token/'
+      GF_AUTH_GENERIC_OAUTH_API_URL: 'https://auth.example.local/application/o/userinfo/'
+      GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_NAME: 'email'
+      GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH: 'name'
+      GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH: 'preferred_username'
+      GF_AUTH_GENERIC_OAUTH_ID_TOKEN_ATTRIBUTE_NAME: 'id_token'
+      GF_AUTH_GENERIC_OAUTH_AUTH_STYLE: 'AutoDetect'
+      GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE: 'true'
+      GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: 'true'
+      GF_AUTH_LDAP_SKIP_ORG_ROLE_SYNC: 'true'
+
+      # Forçar mesclagem com users já existentes no grafana
+      GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: 'true'
+
+      # Server
+      GF_SERVER_PROTOCOL: 'http'
+      GF_SERVER_DOMAIN: 'grafana.example.local'
+      GF_SERVER_ROOT_URL: 'https://grafana.example.local/'
+
+      # Persistência no MySQL externo
+      GF_DATABASE_TYPE: 'mysql'
+      GF_DATABASE_HOST: '${GRAFANA_DB_HOST}'
+      GF_DATABASE_PORT: '${GRAFANA_DB_PORT}'
+      GF_DATABASE_NAME: '${GRAFANA_DB_NAME}'
+      GF_DATABASE_USER: '${GRAFANA_DB_USER}'
+      GF_DATABASE_PASSWORD: '${GRAFANA_DB_PASSWORD}'
+      GF_DATABASE_SSL_MODE: 'disable'
+      GF_PANELS_DISABLE_SANITIZE_HTML: 'true'
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    volumes:
+      - /data/services/grafana/var_grafana:/var/lib/grafana
+      - /data/services/grafana/ldap.toml:/etc/grafana/ldap.toml:ro
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - "${OBS_BIND_IP}:3000:3000"
+    networks:
+      - obs-net
+
+networks:
+  obs-net:
+    external: true

@@ -1,0 +1,27 @@
+name: blackbox
+services:
+  blackbox:
+    image: prom/blackbox-exporter:v0.29.0-distroless
+    container_name: blackbox
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '--config.file=/etc/blackbox/blackbox.yml'
+    mem_limit: 64m
+    dns:
+      - <IP_DNS>
+    volumes:
+      - ./blackbox.yml:/etc/blackbox/blackbox.yml:ro
+      - /data/services/certs/rootCA.crt:/etc/blackbox/rootCA.crt:ro
+    networks:
+      - obs-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  obs-net:
+    external: true

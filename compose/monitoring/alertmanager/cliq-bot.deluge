@@ -1,0 +1,132 @@
+// Incoming Webhook Handler do bot alertas-infra (Zoho Cliq).
+// Cópia de referência: a fonte que roda está no Cliq. Alterou lá, atualiza aqui.
+// Usa as annotations summary, target e description e o label source de cada regra.
+
+canal = "<SEU_CANAL_CLIQ>";
+limite = 10;
+
+alertas = body.get("alerts");
+if (alertas == null || alertas.size() == 0)
+{
+	return Map();
+}
+
+critico = false;
+blocos = List();
+primeiro = null;
+painel = null;
+n = 0;
+
+for each a in alertas
+{
+	labels = a.get("labels");
+	notas = a.get("annotations");
+	resolvido = a.get("status") == "resolved";
+
+	if (resolvido)
+	{
+		status = "✅ RESOLVIDO";
+	}
+	else if (labels.get("severity") == "critical")
+	{
+		status = "🔴 CRÍTICO";
+		critico = true;
+	}
+	else
+	{
+		status = "🟡 AVISO";
+	}
+
+	n = n + 1;
+	if (n > limite)
+	{
+		continue;
+	}
+	if (primeiro == null && !resolvido)
+	{
+		primeiro = labels;
+		painel = notas.get("dashboard");
+	}
+
+	resumo = ifnull(notas.get("summary"), labels.get("alertname"));
+	alvo = ifnull(notas.get("target"), ifnull(labels.get("host"), ""));
+	fonte = ifnull(labels.get("source"), "prometheus");
+
+	quando = "";
+	ini = ifnull(a.get("startsAt"), "");
+	if (ini.length() >= 19)
+	{
+		dtIni = ini.subString(0, 19).replaceAll("T", " ").toTime("yyyy-MM-dd HH:mm:ss").subHour(3);
+		quando = dtIni.toString("dd/MM HH:mm");
+		fim = ifnull(a.get("endsAt"), "");
+		if (resolvido && fim.length() >= 19)
+		{
+			dtFim = fim.subString(0, 19).replaceAll("T", " ").toTime("yyyy-MM-dd HH:mm:ss").subHour(3);
+			minutos = ((dtFim.toLong() - dtIni.toLong()) / 60000).toLong();
+			quando = quando + " → " + dtFim.toString("HH:mm") + " (" + minutos + " min)";
+		}
+	}
+
+	txt = "*" + status + " | " + resumo + "*";
+	if (alvo != "")
+	{
+		txt = txt + "\n" + alvo;
+	}
+	if (!resolvido)
+	{
+		detalhe = ifnull(notas.get("description"), "");
+		if (detalhe != "")
+		{
+			txt = txt + "\n" + detalhe;
+		}
+	}
+	txt = txt + "\n" + quando + " · " + fonte;
+	blocos.add(txt);
+}
+
+if (n > limite)
+{
+	blocos.add("+" + (n - limite) + " alertas no Alertmanager");
+}
+
+corpo = blocos.toString("\n\n");
+
+msg = Map();
+msg.put("text", corpo);
+
+botoes = List();
+if (painel != null && painel != "")
+{
+	botoes.add({"label":"Abrir painel","type":"+","action":{"type":"open.url","data":{"web":painel}}});
+}
+
+// Silenciar já preenchido com alertname + host do primeiro alerta disparando
+ext = body.get("externalURL");
+if (primeiro != null && ext != null && ext != "")
+{
+	filtro = "{alertname=\"" + primeiro.get("alertname") + "\"";
+	if (primeiro.get("host") != null)
+	{
+		filtro = filtro + ",host=\"" + primeiro.get("host") + "\"";
+	}
+	else if (primeiro.get("instance") != null)
+	{
+		filtro = filtro + ",instance=\"" + primeiro.get("instance") + "\"";
+	}
+	filtro = filtro + "}";
+	link = ext + "/#/silences/new?filter=" + encodeUrl(filtro);
+	botoes.add({"label":"Silenciar","type":"-","action":{"type":"open.url","data":{"web":link}}});
+}
+if (botoes.size() > 0)
+{
+	msg.put("buttons", botoes);
+}
+
+resp = zoho.cliq.postToChannel(canal, msg);
+info resp;
+if (resp.toString().containsIgnoreCase("error") || resp.toString().containsIgnoreCase("fail"))
+{
+	resp = zoho.cliq.postToChannel(canal, {"text":corpo});
+	info "reenviado sem botões: " + resp;
+}
+return {"text":resp.toString()};

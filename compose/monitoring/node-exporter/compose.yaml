@@ -1,0 +1,28 @@
+name: node-exporter
+
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    mem_limit: 128m
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '--path.rootfs=/host'
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.systemd'
+      - '--collector.systemd.unit-include=(docker|sshd|firewalld|chronyd|kdump|zabbix-agent2?)\.service'
+      - '--collector.textfile.directory=/host/data/services/node-exporter/textfile'
+      - '--web.listen-address=${NODE_BIND_IP}:9100'
+      - '--web.config.file=/etc/node-exporter/web-config.yml'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host:ro,rslave
+      - /data/services/node-exporter/web-config.yml:/etc/node-exporter/web-config.yml:ro
+      - /data/services/node-exporter/certs:/etc/node-exporter/certs:ro

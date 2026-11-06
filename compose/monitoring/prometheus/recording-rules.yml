@@ -1,0 +1,13 @@
+groups:
+  - name: recording
+    interval: 1m
+    rules:
+      - record: cpu:usage:rate1m
+        expr: >
+          (1 - avg by (instance, job, origin_prometheus) (
+            irate(node_cpu_seconds_total{mode="idle"}[1m])
+          )) * 100
+
+      - record: mem:usage:rate1m
+        expr: >
+          (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100

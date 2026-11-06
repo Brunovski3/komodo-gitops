@@ -1,0 +1,28 @@
+route:
+  receiver: "cliq"
+  group_by: ["alertname", "host"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  routes:
+    - matchers:
+        - severity = "critical"
+      receiver: "cliq"
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 1h
+
+inhibit_rules:
+  - source_matchers:
+      - alertname = "HostDown"
+    target_matchers:
+      - severity =~ "warning|critical"
+    equal: ["host"]
+
+receivers:
+  - name: "cliq"
+    webhook_configs:
+      - url_file: /etc/alertmanager/secrets/cliq_url
+        send_resolved: true
+        max_alerts: 20
