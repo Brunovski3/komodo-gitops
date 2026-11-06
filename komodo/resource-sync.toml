@@ -1,19 +1,24 @@
-# O próprio sync que carrega estes arquivos.
+# O próprio sync que carrega os recursos — com Managed Mode.
 #
-# No Komodo, crie um ResourceSync apontando pra este repo (ou importe este
-# recurso via UI): Core passa a poller este repo e alerta diffs a cada push.
-# O webhook do git pode executar o sync automaticamente em push na branch.
+# git <-> komodo em duas direções:
+#   • Git -> Komodo : Core polla este repo; push gera diff no IDP
+#   • Komodo -> Git : com managed = true (e sync de arquivo único), qualquer
+#     update feito na UI do Komodo volta como commit NESTE arquivo
 #
-# Referência: https://docs.rs/komodo_client/latest/komodo_client/entities/sync/type.ResourceSync.html
+# Requisito do bidirecional: o Core precisa de credenciais de git com WRITE
+# (PAT) configurada como git account/provider no Komodo — repo privado não
+# clona nem pusha sem isso.
+#
+# Ref: https://github.com/moghtech/komodo/blob/main/docsite/docs/automate/sync-resources.md
 
 [[resource_sync]]
-name = "lab-devops-resources"
-description = "Sincroniza recursos declarados neste repo com a instância Komodo"
+name = "homelab-resources"
+description = "Sincroniza recursos declarados neste repo com a instância Komodo (bidirecional, managed)"
+managed = true
 [resource_sync.config]
 git_provider = "github.com"
 repo = "Brunovski3/devops-homelab"
-branch = "master"
+branch = "main"
 resource_path = [
-  "komodo/resources/server.toml",
-  "komodo/resources/stacks.toml",
+  "komodo/resources/lab.toml",
 ]

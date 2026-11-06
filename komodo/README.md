@@ -6,9 +6,10 @@ Recursos declarados em TOML, no formato de Resource Sync do Komodo. A intenção
 
 | Arquivo | O que declara |
 | --- | --- |
-| `resources/server.toml` | O host de produção via Periphery |
-| `resources/stacks.toml` | As 4 stacks: n8n, GLPI, Grafana e o próprio Komodo |
-| `resource-sync.toml` | O sync que carrega os dois arquivos acima |
+
+
+| `resources/lab.toml` | Arquivo único: host (periphery) + stacks (n8n, grafana, komodo) |
+| `resource-sync.toml` | O sync em si — **managed = true** (bidirecional) |
 
 ## Primeiro import
 
