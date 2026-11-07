@@ -29,7 +29,7 @@ deploy = true # TODO: false até validar o primeiro sync
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/n8n"
 file_paths = ["compose.yaml"]
@@ -42,7 +42,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/grafana"
 file_paths = ["compose.yaml"]
@@ -55,7 +55,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/prometheus"
 file_paths = ["compose.yaml"]
@@ -68,7 +68,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/loki"
 file_paths = ["compose.yaml"]
@@ -81,7 +81,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/alloy"
 file_paths = ["compose.yaml"]
@@ -94,7 +94,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/alertmanager"
 file_paths = ["compose.yaml"]
@@ -107,7 +107,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/node-exporter"
 file_paths = ["compose.yaml"]
@@ -120,7 +120,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/monitoring/blackbox"
 file_paths = ["compose.yaml"]
@@ -133,7 +133,7 @@ deploy = false
 [stack.config]
 server = "lab-prod-01"
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 run_directory = "compose/komodo"
 file_paths = ["compose.yaml"]

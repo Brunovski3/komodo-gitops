@@ -17,7 +17,7 @@ description = "Sincroniza recursos declarados neste repo com a instância Komodo
 managed = true
 [resource_sync.config]
 git_provider = "github.com"
-repo = "Brunovski3/devops-homelab"
+repo = "Brunovski3/komodo-gitops"
 branch = "main"
 resource_path = [
   "komodo/resources/lab.toml",
