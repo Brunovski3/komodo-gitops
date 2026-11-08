@@ -4,41 +4,9 @@ Infraestrutura self-hosted em Docker Compose, gerenciada via GitOps pelo Komodo 
 
 ## Arquitetura
 
-```mermaid
-flowchart TB
-    internet[Usuários / Internet] -->|HTTPS| cloudflare[Cloudflare\nDNS, proxy e proteção de borda]
-    cloudflare -->|proxy| traefik[Traefik no host\nReverse proxy de entrada\nTLS com Cloudflare Origin CA]
+![Diagrama de arquitetura do komodo-gitops](docs/arquitetura.png)
 
-    repo[GitHub — repo único\ncompose/stack + komodo/resources/\nResource Sync — Managed Mode]
-
-    subgraph vps[VPS / Docker Host]
-        traefik --> n8n[n8n\nimagem custom:\nPuppeteer + OCI CLI]
-
-        subgraph obs[Observabilidade — 7 stacks]
-            prom[Prometheus] --> graf[Grafana]
-            loki[Loki + Alloy] --> graf
-            prom -->|alertas| am[Alertmanager\n→ webhook]
-            exp[node-exporter · blackbox\nexporters do host] -.-> prom
-        end
-
-        db[(PostgreSQL\nBare Metal no host\nfora de todo compose)]
-        n8n --> db
-
-        komodo[Komodo IDP\nCore + Periphery\nlê lab.toml · diffs · deploy]
-        komodo -->|gerencia| n8n
-        komodo -->|gerencia| obs
-
-        runner[GitHub Actions Runner\nself-hosted]
-    end
-
-    repo ==>|pull · diff| komodo
-    komodo ==>|commit de volta\nmanaged| repo
-    repo -.->|workflow: build + lint| runner
-    runner -.->|aciona deploy| komodo
-
-    ts[Tailscale\nacesso SSH + apps privados\nsomente dispositivos autorizados]
-    ts -->|SSH e administração| vps
-```
+*Fonte editável: [docs/arquitetura.excalidraw](docs/arquitetura.excalidraw) — abre no [excalidraw.com](https://excalidraw.com) ou na extensão Excalidraw do VS Code.*
 
 ## Componentes
 
