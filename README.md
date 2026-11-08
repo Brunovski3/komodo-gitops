@@ -6,8 +6,6 @@ Infraestrutura self-hosted em Docker Compose, gerenciada via GitOps pelo Komodo 
 
 ![Diagrama de arquitetura do komodo-gitops](docs/arquitetura.png)
 
-*Fonte editável: [docs/arquitetura.excalidraw](docs/arquitetura.excalidraw) — abre no [excalidraw.com](https://excalidraw.com) ou na extensão Excalidraw do VS Code.*
-
 ## Componentes
 
 | Componente | Responsabilidade | Exposição |
