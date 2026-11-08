@@ -90,16 +90,6 @@ flowchart TB
 - **Versionado e pronto:** composes de n8n, Komodo e observabilidade; TOMLs do Resource Sync; dashboards e regras de alerta; doc de Bare Metal do Postgres; diagrama de arquitetura.
 - **A preencher antes de subir:** `TODO` do endereço/nome do Periphery em `lab.toml`; `.env` de cada stack (a partir dos `.env.example`); placeholders `<IP_*>` e domínios `.example.local` dentro de `compose/monitoring/` (lista completa no [README da pasta](compose/monitoring/README.md)).
 
-## Próximas etapas
-
-- [ ] Provisionar a VPS com Docker e acesso via Tailscale.
-- [ ] Configurar Cloudflare DNS e Traefik com Origin CA.
-- [ ] Provisionar PostgreSQL Bare Metal e testar restore do backup.
-- [ ] Importar o Resource Sync no Komodo (ver [komodo/README.md](komodo/README.md)) e validar diffs com `deploy = false`.
-- [ ] Subir as stacks de observabilidade na ordem documentada e conferir dashboards.
-- [ ] Configurar rede do Alertmanager → webhook de notificação.
-- [ ] Documentar operação corrente, rollback e recuperação de desastre.
-
 ## Segredos
 
 Nunca commitar: `.env` real, tokens da Cloudflare ou GitHub, chaves do Tailscale, certificados TLS, credenciais de banco, dumps e dados persistentes. Os arquivos `*.example` e os placeholders `<IP_*>`/`<SEU_CANAL_CLIQ>` existem justamente por isso — o conteúdo interno do ambiente de referência foi higienizado na importação.
