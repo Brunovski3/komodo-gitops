@@ -1,154 +1,105 @@
-# DevOps Homelab
+# komodo-gitops
 
-Infraestrutura auto-hospedada para publicar aplicações web com HTTPS, deploy automatizado, monitoramento e acesso administrativo privado. A orquestração é GitOps self-hosted: declaração em Docker Compose versionado, gerência via Komodo (IDP) e deploys acionados por Git.
-
-O objetivo de um blueprint de referência funciona para qualquer stack (frontend + backend + banco). O desenho abaixo usa, como aplicação de exemplo, um **frontend React + Vite** e um **backend FastAPI** (porta interna 8000) — troque pelos containers da aplicação em questão sem alterar as demais camadas.
+Infraestrutura self-hosted em Docker Compose, gerenciada via GitOps pelo Komodo (IDP). Este repo é a fonte declarativa que o Komodo consome: stacks de automação e observabilidade versionadas aqui, sincronizadas em modo bidirecional (Managed Mode) — push no Git gera diff/deploy no IDP, e mudança feita na UI do Komodo volta como commit no repo.
 
 ## Arquitetura
 
 ```mermaid
 flowchart TB
     internet[Usuários / Internet] -->|HTTPS| cloudflare[Cloudflare\nDNS, proxy e proteção de borda]
-    cloudflare -->|proxy| traefik
+    cloudflare -->|proxy| traefik[Traefik no host\nReverse proxy de entrada\nTLS com Cloudflare Origin CA]
 
-    subgraph vps[VPS / Docker Host — Traefik, Komodo, Uptime Kuma, App Stack e GitHub self-hosted runner]
-        traefik[Traefik\nReverse proxy / roteador de entrada\nTLS com Cloudflare Origin CA]
+    repo[GitHub — repo único\ncompose/stack + komodo/resources/\nResource Sync — Managed Mode]
 
-        subgraph app[App Stack — gerenciado pelo Komodo]
-            frontend[Frontend\nReact + Vite]
-            backend[Backend\nFastAPI :8000]
+    subgraph vps[VPS / Docker Host]
+        traefik --> n8n[n8n\nimagem custom:\nPuppeteer + OCI CLI]
+
+        subgraph obs[Observabilidade — 7 stacks]
+            prom[Prometheus] --> graf[Grafana]
+            loki[Loki + Alloy] --> graf
+            prom -->|alertas| am[Alertmanager\n→ webhook]
+            exp[node-exporter · blackbox\nexporters do host] -.-> prom
         end
 
-        traefik --> frontend
-        traefik --> backend
-
         db[(PostgreSQL\nBare Metal no host\nfora de todo compose)]
-        backend --> db
+        n8n --> db
 
-        komodo[Komodo\nGerência de stack\ndeploy / restart / update]
-        komodo -->|gerência| app
-        komodo -.->|update stack| app
+        komodo[Komodo IDP\nCore + Periphery\nlê lab.toml · diffs · deploy]
+        komodo -->|gerencia| n8n
+        komodo -->|gerencia| obs
 
-        runner[GitHub Self-hosted Runner\nDeploy interno instantâneo]
-        runner -.->|aciona deploy| komodo
-
-        kuma[Uptime Kuma\nMonitoramento e alertas]
+        runner[GitHub Actions Runner\nself-hosted]
     end
 
-    github[GitHub\nRepositório + Actions\nBuild / release / workflow] -.->|workflow / job| runner
+    repo ==>|pull · diff| komodo
+    komodo ==>|commit de volta\nmanaged| repo
+    repo -.->|workflow: build + lint| runner
+    runner -.->|aciona deploy| komodo
 
-    ts[Tailscale\nAcesso sem expor aplicações\nSomente dispositivos autorizados\nPermite SSH privado]
-    ts -->|acesso SSH| vps
-    ts --> kuma
-    ts --> komodo
-    kuma -.->|checa e alerta| komodo
+    ts[Tailscale\nacesso SSH + apps privados\nsomente dispositivos autorizados]
+    ts -->|SSH e administração| vps
 ```
-
-> **Blueprint genérico**: o desenho usa React + FastAPI como exemplos de frontend/backend, e PostgreSQL como banco. Qualquer stack entra no quadrado da App Stack sem mover Cloudflare, Traefik, Komodo, runner ou Uptime Kuma — e o fluxo de deploy continua o mesmo, disparado pelo Git.
-
 
 ## Componentes
 
 | Componente | Responsabilidade | Exposição |
 | --- | --- | --- |
-| Cloudflare | DNS, proxy, TLS de borda e proteção | Pública |
-| Traefik | Terminação TLS na origem (Origin CA) e roteamento para containers | Pública, somente HTTPS |
-| App Stack | Containers da aplicação (ex.: frontend React + Vite, backend FastAPI :8000) | Pública via Traefik |
-| PostgreSQL (Bare Metal) | Persistência via systemd no próprio host, fora de todo Compose | Privada, acessível apenas pela bridge Docker |
-| Komodo | Gerência da stack: deploy, restart e update via Git | Privada via Tailscale |
-| GitHub Actions | Build, release e orquestração do deploy | GitHub |
-| Self-hosted Runner | Executor interno dos workflows, acionando o Komodo | Privado na VPS |
-| Uptime Kuma | Health checks, monitoramento e alertas | Privado via Tailscale |
-| Tailscale | SSH e acesso administrativo sem expor aplicações | Dispositivos autorizados |
+| Cloudflare | DNS, proxy, proteção de borda | Pública |
+| Traefik (no host) | Terminação TLS na origem (Origin CA) e roteamento; rotas de observabilidade em [docs/traefik-core-file-provider.yml](docs/traefik-core-file-provider.yml) | Pública, somente HTTPS |
+| n8n | Automação — imagem custom com Puppeteer e OCI CLI, Postgres como banco | Via Traefik |
+| Stack de observabilidade | Prometheus (métricas, recording rules, ~16 alertas), Grafana (dashboards NOC/Traefik/hosts/backup), Loki + Alloy (logs de containers e journald), Alertmanager (roteamento via webhook), node-exporter e blackbox (exporters) | Privada via Tailscale |
+| PostgreSQL | Persistência em Bare Metal — systemd no host, fora de todo Compose ([docs/postgres-bare-metal.md](docs/postgres-bare-metal.md)) | Bridge Docker local, pg_hba restrito |
+| Komodo (IDP) | Declaração e gerência das stacks a partir de [komodo/resources/lab.toml](komodo/resources/lab.toml) | Privada via Tailscale |
+| GitHub Actions + Runner | CI: build e lint; deploy acionando o Komodo | Runner privado na VPS |
+| Tailscale | SSH e acesso administrativo sem portas na internet | Dispositivos autorizados |
 
-## Fluxos principais
+## Fluxo GitOps (bidirecional)
 
-### Tráfego da aplicação
+- **Git → Komodo:** o Resource Sync do Komodo polla este repo (`komodo/resource-sync.toml`); qualquer mudança em `compose/` ou em `lab.toml` aparece como diff de recursos no IDP. Stacks novas entram com `deploy = false` (detecta diff sem aplicar) e passam a `true` quando validadas.
+- **Komodo → Git:** com `managed = true`, qualquer edição feita na UI do Komodo (tag de imagem, env, variável de stack) é escrita de volta em `lab.toml` como commit neste repo. O Git permanece a fonte da verdade.
 
-1. O usuário acessa o domínio pela internet.
-2. A Cloudflare resolve o DNS, aplica a proteção de borda e encaminha o tráfego HTTPS.
-3. O Traefik recebe a requisição na VPS usando um certificado Cloudflare Origin CA.
-4. O Traefik encaminha a requisição para o frontend ou backend correto.
-5. Apenas o backend pode se conectar ao PostgreSQL (Bare Metal no host), via bridge Docker, com pg_hba restrito.
-
-### Deploy
-
-1. Uma alteração chega à branch de deploy no GitHub.
-2. O GitHub Actions executa validações, build e publicação da imagem.
-3. O workflow é executado pelo self-hosted runner dentro da infraestrutura.
-4. O runner solicita ao Komodo a atualização da stack.
-5. O Komodo atualiza os containers e mantém o ciclo de vida da aplicação.
-6. O Uptime Kuma verifica a disponibilidade após o deploy e envia alertas em caso de falha.
-
-### Acesso administrativo
-
-1. O administrador entra na tailnet pelo Tailscale a partir de um dispositivo autorizado.
-2. O acesso SSH à VPS e às interfaces do Komodo e Uptime Kuma ocorre pela rede privada.
-3. Nenhuma ferramenta administrativa precisa ser exposta diretamente à internet.
-
-## Princípios de segurança
-
-- O PostgreSQL não publica portas para a internet.
-- Serviços administrativos usam acesso privado via Tailscale.
-- O Traefik só expõe serviços declarados explicitamente por labels Docker.
-- Todo tráfego público utiliza HTTPS; a conexão Cloudflare → VPS usa Origin CA.
-- Segredos ficam fora do Git: `.env`, tokens, certificados, chaves e backups são ignorados.
-- Imagens, dependências e workflows devem ser versionados e revisados antes do deploy.
-
-## Estrutura (o repo é A fonte que o Komodo aponta)
+## Estrutura do repo
 
 ```text
 .
-├── compose/                   # stacks por serviço — o que o Komodo pulla
-│   ├── n8n/                   # compose.yaml + Dockerfile (imagem custom com Puppeteer/OCI CLI)
-│   ├── grafana/               # compose.yaml (observabilidade)
-│   ├── komodo/                # core + mongo + periphery (o gerente de stacks, com komodo.skip)
-│   └── data/                  # volumes persistentes e scripts (.gitkeep / .env.example)
-│       └── services/n8n/scripts/
-├── komodo/                    # Resource Sync do Komodo (server, stacks e resource_sync TOML)
-│   ├── resources/
-│   │   ├── server.toml        # host da VPS via periphery (TODO: melhor preêncher antes)
-│   │   └── stacks.toml        # lê compose/<serviço>/ — aponta para ESTE repo
-│   ├── resource-sync.toml     # o própriozy sync
-│   └── README.md
+├── compose/
+│   ├── n8n/                     # compose.yaml + Dockerfile + .env.example
+│   ├── monitoring/              # stack de observabilidade (7 pastas)
+│   │   ├── prometheus/          # prometheus.yml, alerts.yml, recording-rules.yml
+│   │   ├── grafana/             # dashboards/*.json, ldap.toml.example
+│   │   ├── loki/                # config.yaml, rules/ (alerta por log)
+│   │   ├── alloy/               # coletor de logs
+│   │   ├── alertmanager/        # alertmanager.yml, cliq-bot.deluge
+│   │   ├── node-exporter/
+│   │   └── blackbox/            # blackbox.yml (probes HTTP)
+│   ├── komodo/                  # o próprio Komodo (core + mongo + periphery)
+│   └── data/                    # placeholders de volume (services/n8n/...)
+├── komodo/
+│   ├── resources/lab.toml       # servidor + 9 stacks declarados (arquivo único, Managed Mode)
+│   ├── resource-sync.toml       # o Resource Sync (managed = true)
+│   └── README.md                # como importar no Komodo pela primeira vez
 ├── docs/
-│   └── postgres-bare-metal.md # PostgreSQL no host: install, pg_hba, backup, restore
-└── .github/workflows/         # CI, build e deploy
+│   ├── postgres-bare-metal.md
+│   ├── traefik-core-file-provider.yml
+│   └── arquitetura-proposta.*   # diagrama Excalidraw editável + PNG
+└── .gitignore
 ```
-
-## Fluxo GitOps
-
-1. Compose mudou no `compose/<serviço>/` → push.
-2. O **Resource Sync** (komodo/resource-sync.toml) poll这份Git no Komodo Core.
-3. Composes atualizam → Komodo registra diff e mostra o risco de estados divergir.
-4. Stacks atualizadas — **simulable** ou executando o deploy no IDP.
-5. `komodo/README.md` determina osISTICS do primeiro seguindo a entry do sync (TODOサーバー).
-
-## Operação
-
-| Rotina | Objetivo |
-| --- | --- |
-| Monitoramento | Acompanhar disponibilidade do frontend, API, proxy, banco e certificado TLS. |
-| Backup | Gerar e testar backups periódicos do PostgreSQL e dos volumes persistentes. |
-| Atualizações | Atualizar imagens e dependências de forma controlada, com possibilidade de rollback. |
-| Revisão de acesso | Revisar dispositivos, ACLs e chaves do Tailscale regularmente. |
-| Recuperação | Manter runbooks para reconstrução da VPS e restauração dos dados. |
 
 ## Estado do projeto
 
-O repositório começa pela documentação da arquitetura. A implementação será adicionada incrementalmente: provisionamento da VPS, redes Docker, Traefik, banco, stack da aplicação, CI/CD, acesso privado, monitoramento e rotinas de backup.
+- **Versionado e pronto:** composes de n8n, Komodo e observabilidade; TOMLs do Resource Sync; dashboards e regras de alerta; doc de Bare Metal do Postgres; diagrama de arquitetura.
+- **A preencher antes de subir:** `TODO` do endereço/nome do Periphery em `lab.toml`; `.env` de cada stack (a partir dos `.env.example`); placeholders `<IP_*>` e domínios `.example.local` dentro de `compose/monitoring/` (lista completa no [README da pasta](compose/monitoring/README.md)).
 
 ## Próximas etapas
 
-- [ ] Inicializar o repositório Git e publicar no GitHub.
 - [ ] Provisionar a VPS com Docker e acesso via Tailscale.
-- [ ] Configurar Cloudflare e Traefik com Origin CA.
-- [ ] Provisionar PostgreSQL em Bare Metal ([docs/postgres-bare-metal.md](docs/postgres-bare-metal.md)): install, pg_hba restrito à bridge, backup diário + restore testado.
-- [ ] Adicionar a stack frontend, backend FastAPI e migrations.
-- [ ] Configurar Komodo, runner self-hosted e GitHub Actions.
-- [ ] Configurar monitores e alertas no Uptime Kuma.
-- [ ] Documentar operações, rollback e recuperação de desastre.
+- [ ] Configurar Cloudflare DNS e Traefik com Origin CA.
+- [ ] Provisionar PostgreSQL Bare Metal e testar restore do backup.
+- [ ] Importar o Resource Sync no Komodo (ver [komodo/README.md](komodo/README.md)) e validar diffs com `deploy = false`.
+- [ ] Subir as stacks de observabilidade na ordem documentada e conferir dashboards.
+- [ ] Configurar rede do Alertmanager → webhook de notificação.
+- [ ] Documentar operação corrente, rollback e recuperação de desastre.
 
-## Aviso sobre segredos
+## Segredos
 
-Nunca faça commit de arquivos `.env`, tokens da Cloudflare ou GitHub, chaves do Tailscale, certificados TLS, credenciais de banco, dumps ou diretórios de dados persistentes.
+Nunca commitar: `.env` real, tokens da Cloudflare ou GitHub, chaves do Tailscale, certificados TLS, credenciais de banco, dumps e dados persistentes. Os arquivos `*.example` e os placeholders `<IP_*>`/`<SEU_CANAL_CLIQ>` existem justamente por isso — o conteúdo interno do ambiente de referência foi higienizado na importação.
